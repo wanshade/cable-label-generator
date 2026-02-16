@@ -60,11 +60,11 @@ M1D-TX-010A,500mm² 110 XLPE CU FLEX 20-OF,ORIGIN: M1D-TX-010A,DESTINATION: M1D-
 
 | Property | Value |
 |----------|-------|
-| Label Size | 80mm x 40mm |
+| **Label Size** | **180mm x 45mm** |
 | Mounting Holes | **5mm x 2.5mm** rectangular, 5mm from corners |
-| Hole Spacing | 70mm x 30mm (center-to-center) |
-| Sheet Layout | 6 labels per row, 7 rows = 42 labels per sheet |
-| Sheet Size | ~500mm x 320mm |
+| Hole Spacing | 170mm x 35mm (center-to-center) |
+| Sheet Layout | 3 labels per row, 6 rows = 18 labels per sheet |
+| Sheet Size | ~548mm x 284mm |
 
 ## Output Structure
 
@@ -87,17 +87,18 @@ output/
 ## Example Label Content
 
 ```
-┌─────────────────────────┐ ◄── 80mm
-│ ■                   ■   │ ◄── Mounting holes
-│                         │
-│    M1D-TX-010A          │ ◄── Cable ID (large)
-│                         │
-│ 500mm² 110 XLPE CU...   │ ◄── Specification
-│ FROM: M1D-TX-010A       │ ◄── Origin
-│ TO: M1D-MSB-010A        │ ◄── Destination
-│ ■                   ■   │
-└─────────────────────────┘
-         40mm
+┌────────────────────────────────────────────────────────────────────────────────────┐ ◄── 180mm
+│  ■                                                                          ■      │ ◄── 5mm x 2.5mm holes
+│                                                                                    │
+│                           M1D-MSB-010A                                             │ ◄── Cable ID (center, 7mm)
+│                    240mm² 110 XLPE CU FLEX 8-OF                                    │ ◄── Spec (center, 4mm)
+│                                                                                    │
+│  ORIGIN: M1D-MSB-010A                                                              │ ◄── ORIGIN (left, 3.5mm)
+│  DEST: M1D-PDU-010-A1                                                              │ ◄── DEST (left, 3.5mm)
+│                                                                                    │
+│  ■                                                                          ■      │
+└────────────────────────────────────────────────────────────────────────────────────┘
+                                          45mm
 ```
 
 ## Python API
