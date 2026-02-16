@@ -44,9 +44,9 @@ class CableLabelGenerator:
         self.canvas_width = 600  # mm
         self.canvas_height = 300  # mm
         
-        # Label dimensions (default)
-        self.label_width = 80  # mm
-        self.label_height = 40  # mm
+        # Label dimensions (180mm x 45mm - corrected size)
+        self.label_width = 180  # mm
+        self.label_height = 45  # mm
         
         # Ensure output directory exists
         os.makedirs(output_dir, exist_ok=True)
@@ -152,58 +152,57 @@ class CableLabelGenerator:
             ]
             msp.add_lwpolyline(hole_points, close=True, dxfattribs={"layer": "Hole"})
         
-        # Add text - Layout matching MLA sample DXF style
-        text_margin = 4
+        # Add text - Layout matching MLA sample DXF style (180mm x 45mm)
+        text_margin = 5
         
         # Cable ID (top, larger font, centered)
         msp.add_text(
             cable.cable_id,
-            height=6,
+            height=7,
             dxfattribs={
                 "layer": "Text",
                 "style": "STANDARD",
-                "insert": (label_width/2, label_height - 10),
-                "halign": ezdxf.const.CENTER,
-                "valign": ezdxf.const.MIDDLE,
-                "font": "Arial"  # Standard clean font like sample
-            }
-        )
-        
-        # Specification (below cable ID)
-        spec_text = cable.specification[:35] if len(cable.specification) > 35 else cable.specification
-        msp.add_text(
-            spec_text,
-            height=3.5,
-            dxfattribs={
-                "layer": "Text",
-                "insert": (label_width/2, label_height - 18),
+                "insert": (label_width/2, label_height - 12),
                 "halign": ezdxf.const.CENTER,
                 "valign": ezdxf.const.MIDDLE
             }
         )
         
-        # Origin (left aligned, bottom section)
+        # Specification (below cable ID) - wider label allows longer text
+        spec_text = cable.specification[:55] if len(cable.specification) > 55 else cable.specification
+        msp.add_text(
+            spec_text,
+            height=4,
+            dxfattribs={
+                "layer": "Text",
+                "insert": (label_width/2, label_height - 22),
+                "halign": ezdxf.const.CENTER,
+                "valign": ezdxf.const.MIDDLE
+            }
+        )
+        
+        # Origin (left aligned, bottom section) - wider label allows longer text
         if cable.origin:
-            origin_short = cable.origin[:22] if len(cable.origin) > 22 else cable.origin
+            origin_short = cable.origin[:45] if len(cable.origin) > 45 else cable.origin
             msp.add_text(
                 f"ORIGIN: {origin_short}",
-                height=3,
+                height=3.5,
                 dxfattribs={
                     "layer": "Text",
-                    "insert": (text_margin, 12),
+                    "insert": (text_margin, 14),
                     "valign": ezdxf.const.MIDDLE
                 }
             )
         
         # Destination (left aligned, below origin)
         if cable.destination:
-            dest_short = cable.destination[:22] if len(cable.destination) > 22 else cable.destination
+            dest_short = cable.destination[:45] if len(cable.destination) > 45 else cable.destination
             msp.add_text(
                 f"DEST: {dest_short}",
-                height=3,
+                height=3.5,
                 dxfattribs={
                     "layer": "Text",
-                    "insert": (text_margin, 6),
+                    "insert": (text_margin, 7),
                     "valign": ezdxf.const.MIDDLE
                 }
             )
@@ -299,20 +298,20 @@ class CableLabelGenerator:
             height=6,
             dxfattribs={
                 "layer": "Text",
-                "insert": (x + width/2, y + height - 8),
+                "insert": (x + width/2, y + height - 12),
                 "halign": ezdxf.const.CENTER,
                 "valign": ezdxf.const.MIDDLE
             }
         )
         
-        # Specification
-        spec = cable.specification[:28] if len(cable.specification) > 28 else cable.specification
+        # Specification - wider label allows longer text
+        spec = cable.specification[:50] if len(cable.specification) > 50 else cable.specification
         msp.add_text(
             spec,
-            height=3,
+            height=3.5,
             dxfattribs={
                 "layer": "Text",
-                "insert": (x + width/2, y + height - 15),
+                "insert": (x + width/2, y + height - 22),
                 "halign": ezdxf.const.CENTER,
                 "valign": ezdxf.const.MIDDLE
             }
@@ -320,26 +319,26 @@ class CableLabelGenerator:
         
         # Origin (left aligned, bottom section) - MLA sample style
         if cable.origin:
-            origin_short = cable.origin[:20] if len(cable.origin) > 20 else cable.origin
+            origin_short = cable.origin[:40] if len(cable.origin) > 40 else cable.origin
             msp.add_text(
                 f"ORIGIN: {origin_short}",
-                height=2.8,
+                height=3.2,
                 dxfattribs={
                     "layer": "Text",
-                    "insert": (x + text_margin, y + 10),
+                    "insert": (x + text_margin, y + 12),
                     "valign": ezdxf.const.MIDDLE
                 }
             )
         
         # Destination (left aligned, below origin)
         if cable.destination:
-            dest_short = cable.destination[:20] if len(cable.destination) > 20 else cable.destination
+            dest_short = cable.destination[:40] if len(cable.destination) > 40 else cable.destination
             msp.add_text(
                 f"DEST: {dest_short}",
-                height=2.8,
+                height=3.2,
                 dxfattribs={
                     "layer": "Text",
-                    "insert": (x + text_margin, y + 5),
+                    "insert": (x + text_margin, y + 6),
                     "valign": ezdxf.const.MIDDLE
                 }
             )
@@ -389,8 +388,11 @@ class CableLabelGenerator:
         if combined:
             print("Generating combined label sheets...")
             
-            # Split into batches of 42 (6x7 grid fits 600x420mm)
-            batch_size = 42
+            # Calculate layout for 180mm x 45mm labels on 600x300mm canvas
+            # 600 / (180 + 2) = ~3.3 → 3 labels per row
+            # 300 / (45 + 2) = ~6.4 → 6 rows
+            # Total: 3 x 6 = 18 labels per sheet
+            batch_size = 18
             batches = [cables[i:i+batch_size] 
                       for i in range(0, len(cables), batch_size)]
             
@@ -398,9 +400,9 @@ class CableLabelGenerator:
                 filename = f"cable_labels_sheet_{batch_num:02d}.dxf"
                 filepath = self.create_multi_label_sheet(
                     batch, filename,
-                    labels_per_row=6,
-                    label_width=80,
-                    label_height=40,
+                    labels_per_row=3,
+                    label_width=180,
+                    label_height=45,
                     spacing=2
                 )
                 generated_files.append(filepath)
