@@ -1,0 +1,13 @@
+# Contoh penggunaan dengan file CSV yang dikirim
+
+# 1. Copy CSV ke folder ini
+cp "/path/to/CSV---43ba4ada-93de-498f-879f-e4ea26fe48a0.csv" ./cables.csv
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Generate labels
+python generate_labels.py cables.csv
+
+# 4. Hasil akan ada di folder output/
+ls -la output/
